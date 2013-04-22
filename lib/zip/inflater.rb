@@ -39,7 +39,12 @@ module Zip
     def internal_produce_input(buf = nil)
       retried = 0
       begin
-        @zlibInflater.inflate(@inputStream.read(Decompressor::CHUNK_SIZE, buf))
+        if @inputStream.is_a? StringIO
+          # Special case for StringIO
+          @zlibInflater.inflate(@inputStream.read(Decompressor::CHUNK_SIZE))
+        else
+          @zlibInflater.inflate(@inputStream.read(Decompressor::CHUNK_SIZE, buf))
+        end
       rescue Zlib::BufError
         raise if (retried >= 5) # how many times should we retry?
         retried += 1
