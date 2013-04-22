@@ -217,7 +217,12 @@ module Zip
       end
 
       def read_local_entry(io)
-        entry = new(io.path)
+        if io.is_a? StringIO
+          # path does not work for stringio
+          entry = new("stringio")
+        else
+          entry = new(io.path)
+        end
         entry.read_local_entry(io)
         entry
       rescue ZipError
